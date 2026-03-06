@@ -180,8 +180,27 @@ const AdminPanel = () => {
 
   // Render Login Screen if not authenticated
   if (!isAuthenticated) {
+    const isConfigured = import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_ANON_KEY;
+    
     return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-primary)' }}>
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-primary)', flexDirection: 'column', gap: '20px' }}>
+        {!isConfigured && (
+          <div style={{ 
+            background: 'rgba(255, 68, 68, 0.1)', 
+            border: '1px solid #ff4444', 
+            color: '#ff4444', 
+            padding: '16px', 
+            borderRadius: '12px',
+            maxWidth: '400px',
+            textAlign: 'center',
+            fontSize: '0.9rem'
+          }}>
+            <AlertCircle size={20} style={{ marginBottom: '8px' }} />
+            <br />
+            <b>Configuration Missing:</b> Supabase Environment Variables not found in Netlify. 
+            Please add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to your Netlify settings.
+          </div>
+        )}
         <form onSubmit={handleLogin} className="glass-panel" style={{ padding: '40px', width: '100%', maxWidth: '400px', display: 'flex', flexDirection: 'column', gap: '24px', alignItems: 'center' }}>
           <Lock size={48} color="var(--accent-green)" />
           <h2 style={{ fontSize: '1.5rem', fontWeight: 800 }}>Admin Access</h2>
