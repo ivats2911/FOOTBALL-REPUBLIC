@@ -9,6 +9,10 @@ CREATE TABLE IF NOT EXISTS public.products (
   price NUMERIC NOT NULL,
   description TEXT NOT NULL,
   image_url TEXT,
+  design_scale INT DEFAULT 50,
+  design_x INT DEFAULT 50,
+  design_y INT DEFAULT 35,
+  use_mockup BOOLEAN DEFAULT TRUE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
@@ -57,6 +61,10 @@ CREATE POLICY "Enable read access for all users" ON public.products
 DROP POLICY IF EXISTS "Enable insert access for all users (demo only)" ON public.products;
 CREATE POLICY "Enable insert access for all users (demo only)" ON public.products
   FOR INSERT WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Enable delete access for all users (demo only)" ON public.products;
+CREATE POLICY "Enable delete access for all users (demo only)" ON public.products
+  FOR DELETE USING (true);
 
 -- Profiles policies
 DROP POLICY IF EXISTS "Public profiles are viewable by everyone." ON public.profiles;
@@ -110,3 +118,19 @@ DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+
+-- STORAGE SETUP
+-- Create the bucket for product images if it doesn't exist
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('Products', 'Products', true)
+ON CONFLICT (id) DO NOTHING;
+
+-- Allow public access to images
+DROP POLICY IF EXISTS "Public Access" ON storage.objects;
+CREATE POLICY "Public Access" ON storage.objects
+  FOR SELECT USING (bucket_id = 'Products');
+
+-- Allow anyone to upload images (For demo purposes, in production restrict this)
+DROP POLICY IF EXISTS "Allow Uploads" ON storage.objects;
+CREATE POLICY "Allow Uploads" ON storage.objects
+  FOR INSERT WITH CHECK (bucket_id = 'Products');

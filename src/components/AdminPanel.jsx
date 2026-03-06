@@ -81,18 +81,25 @@ const AdminPanel = () => {
       const fileName = `${Math.random()}.${fileExt}`;
       const filePath = `product-images/${fileName}`;
 
-      let { error: uploadError } = await supabase.storage
+      console.log('Attempting upload to bucket "Products" at path:', filePath);
+
+      let { error: uploadError, data } = await supabase.storage
         .from('Products')
         .upload(filePath, file);
 
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        console.error('Supabase Storage Upload Error:', uploadError);
+        throw uploadError;
+      }
 
       const { data: { publicUrl } } = supabase.storage
         .from('Products')
         .getPublicUrl(filePath);
 
+      console.log('Upload successful! Public URL:', publicUrl);
       return publicUrl;
     } catch (error) {
+      console.error('Caught error during image upload process:', error);
       throw new Error('Error uploading image: ' + error.message);
     }
   };
