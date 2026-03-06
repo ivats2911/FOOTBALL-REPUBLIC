@@ -2,7 +2,7 @@ import React from 'react';
 import { X, Trash2, ArrowRight, ShoppingBag, Minus, Plus } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const CartOverlay = ({ isOpen, onClose, cartItems, onRemoveItem, onUpdateQuantity }) => {
+const CartOverlay = ({ isOpen, onClose, cartItems, onRemoveItem, onUpdateQuantity, onCheckout }) => {
   const total = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
   return (
@@ -201,7 +201,11 @@ const CartOverlay = ({ isOpen, onClose, cartItems, onRemoveItem, onUpdateQuantit
                   <span>Subtotal</span>
                   <span>₹{total.toLocaleString('en-IN')}</span>
                 </div>
-                <button className="btn-primary" style={{ width: '100%', padding: '16px' }}>
+                <button 
+                  className="btn-primary" 
+                  style={{ width: '100%', padding: '16px' }}
+                  onClick={onCheckout}
+                >
                   Proceed to Checkout <ArrowRight size={20} />
                 </button>
               </div>
